@@ -1,20 +1,78 @@
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute, NavigationContainer, RouteProp } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Text } from 'react-native';
+import { COLORS } from './src/constants';
+import { HomeStackParamList, RootTabParamList } from './src/navigation/types';
+import { BreakScreen } from './src/screens/BreakScreen';
+import { FocusTimerScreen } from './src/screens/FocusTimerScreen';
+import { HomeScreen } from './src/screens/HomeScreen';
+import { RecordScreen } from './src/screens/RecordScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
+import { StatsScreen, TodaySummaryScreen } from './src/screens/StatsScreen';
 
-export default function App() {
+const Tab = createBottomTabNavigator<RootTabParamList>();
+const Stack = createNativeStackNavigator<HomeStackParamList>();
+
+function HomeStack() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: COLORS.background },
+      }}
+    >
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="FocusTimer" component={FocusTimerScreen} />
+      <Stack.Screen name="Record" component={RecordScreen} />
+      <Stack.Screen name="Break" component={BreakScreen} />
+      <Stack.Screen name="TodaySummary" component={TodaySummaryScreen} />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+function getTabBarStyle(route: RouteProp<RootTabParamList, 'HomeStack'>) {
+  const focusedRoute = getFocusedRouteNameFromRoute(route) ?? 'Home';
+  return {
+    backgroundColor: COLORS.white,
+    display: focusedRoute === 'Home' ? 'flex' : 'none',
+  } as const;
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StatusBar style="dark" />
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: COLORS.primary,
+          tabBarInactiveTintColor: COLORS.textSecondary,
+          tabBarStyle: { backgroundColor: COLORS.white },
+        }}
+      >
+        <Tab.Screen
+          name="HomeStack"
+          component={HomeStack}
+          options={({ route }) => ({
+            tabBarLabel: 'ホーム',
+            tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>始</Text>,
+            tabBarStyle: getTabBarStyle(route),
+          })}
+        />
+        <Tab.Screen
+          name="Stats"
+          component={StatsScreen}
+          options={{ tabBarLabel: '積み上げ', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>積</Text> }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ tabBarLabel: '設定', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>設</Text> }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
