@@ -1,50 +1,95 @@
 # 低燃費スタディ
 
-## AdMob iOS 実機確認
+「やる気がない日でも、まず5分だけ」をコンセプトにした、iOS / Android向けの集中支援アプリです。体力や気分に合わせて小さな行動を決め、タイマーで取り組み、できた分を記録できます。
 
-このプロジェクトは `react-native-google-mobile-ads` を使うため、Expo Go では AdMob のネイティブ広告を確認できません。iOS 実機では EAS development build を作成して確認します。
+## 解決したい課題
 
-### 現在の確認用設定
+勉強や仕事を始めたいと思っていても、疲れている日は「25分集中する」「タスクを全部終わらせる」といった目標自体が負担になります。本アプリでは、現在の余力（HP）と次の一手を先に選び、5分から始められる形にすることで、着手までの心理的な負担を下げることを目指しました。
 
-- `eas.json` に iOS 実機向けの `development-ios` profile があります。
-- `app.json` の `ios.bundleIdentifier` は `com.yuu.pomodorotimer` です。
-- `app.json` の `expo.extra.eas.projectId` は設定済みです。
-- `app.json` の `react-native-google-mobile-ads` plugin に iOS App ID が設定済みです。
-- `src/ads/AdMobConfig.ts` の `isUsingTestAds` は `true` のままにします。
-- iOS の banner ad unit は Google のテスト広告 ID を使います。
+## 主な機能
 
-### 初回準備
+- HP（低い・普通・いける）に応じた5分・25分・50分の時間提案
+- 勉強・仕事・読書・その他のモード選択と「次の一手」の候補表示
+- 一時停止・再開・中断・完了に対応した集中タイマー
+- 完了・途中まで・無理だった、の3段階と任意メモによる振り返り
+- 5分／15分の休憩タイマーと、次の行動への導線
+- 今日・今週・今月・累計の集中時間、件数、モード別記録の集計
+- 通知とバイブレーションのON／OFF設定
+- AsyncStorageによる端末内保存（アカウント登録やサーバー同期はありません）
+- AdMobバナー表示（WebとExpo Goでは代替表示。Androidの本番広告設定は未完了）
 
-1. EAS CLI にログインします。
+## 使用技術
 
-   ```sh
-   npx eas login
-   ```
+- React Native / Expo SDK 54
+- TypeScript
+- React Navigation（Bottom Tabs / Native Stack）
+- AsyncStorage
+- Expo Notifications / Expo Haptics
+- React Native Google Mobile Ads / EAS Build
 
-2. Apple Developer Program に登録された Apple ID で iOS の署名設定を進められる状態にします。
-3. 実機の UDID 登録が求められた場合は、EAS CLI の案内に従って登録します。
+## 開発期間
 
-### development build の作成
+最初の約2時間で小規模なプロトタイプを作成し、その数日後に約2時間の改修を行いました。合計の作業時間は約4時間です。
+
+## 自分の担当範囲
+
+コードの直接的な記述は生成AIに任せ、作りたい機能や修正内容の指示、生成されたアプリの動作確認、問題点の発見、修正方針の判断を担当しました。特に、コードが生成されたことだけで完成とはせず、実際に操作して意図した動作になっているかを確認することに重点を置きました。
+
+## 工夫した点
+
+- 体調に合わせて目標を小さくできるよう、HP選択と所要時間の提案を組み合わせました。
+- 「未達」を消さず、途中まで・無理だった、も記録できる設計にしました。
+- タスク入力に迷ったときは、モード別の候補から次の一手を選べるようにしました。
+- アカウント登録をしなくても、すぐに使い始められる形にしました。
+
+## 苦労した点と対応
+
+生成AIが作成した内容を一度で完成とはせず、実際にアプリを操作して、意図と違う部分を具体的に伝えながら改修しました。特に広告は、通常のExpo Goでは実際の表示を確認できなかったため、実機確認用のdevelopment buildを使う方法を調べて対応しました。
+
+## 生成AIの利用範囲
+
+最初のプロトタイプ作成にはClaude Code、その数日後の改修にはCodexを利用しました。自分ではコードを直接記述していません。作りたい内容をAIへ伝え、生成されたアプリを自分で操作し、意図と違う部分や使いにくい部分があれば修正を依頼しました。その後、修正された内容をもう一度操作して確認しました。
+
+生成AIにはコード作成を任せ、自分は「何を作るかを決めること」「実際に使って確認すること」「どこを直すか判断すること」を担当しました。
+
+## 起動方法
+
+Node.jsとnpmを用意し、次のコマンドを実行します。
+
+```sh
+npm install
+npm start
+```
+
+Expo Goでは主要な画面と操作を確認できます。ただし実際の広告表示など、スマートフォン固有の機能を確認するときは、実機確認用のdevelopment buildを使用します。
 
 ```sh
 npx eas build --platform ios --profile development-ios
-```
-
-ビルド完了後、EAS の案内に従って実機に development build をインストールします。
-
-### 実機での起動
-
-development build をインストールした iPhone と開発マシンを同じネットワークに接続し、Metro を development client 向けに起動します。
-
-```sh
 npx expo start --dev-client
 ```
 
-iPhone で development build を開き、表示された開発サーバーへ接続します。
+### 確認用コマンド
 
-### 確認ポイント
+このリポジトリには、現時点で自動テストとlintの設定はありません。TypeScriptの型に問題がないかは、次のコマンドで確認できます。
 
-- Home 画面下部の広告枠にテスト広告が表示されること。
-- Expo Go ではなく、EAS development build で起動していること。
-- `src/ads/AdMobConfig.ts` の `isUsingTestAds` が `true` のままであること。
-- 広告が表示されない場合は、数十秒待ってからアプリを再起動し、Metro と端末が同じネットワークにいるか確認します。
+```sh
+npx tsc --noEmit
+```
+
+## 現在の制約
+
+- 短時間で作成したプロトタイプのため、自動テストはまだありません。
+- クラウド同期、ログイン、複数端末でのデータ共有はありません。
+- アプリを閉じている間に、タイマー終了時刻に合わせて通知する機能はありません。
+- iOSを中心に動作確認しており、Androidの実広告は未確認です。
+
+## 今後の改善点
+
+- タイマーと集計ロジックの自動テスト追加
+- 記録の編集・削除機能
+- アプリを閉じている間のタイマー終了通知
+- Android実機での確認
+- 文字の読みやすさや操作しやすさの検証
+- READMEへの実機画面・操作例の追加
+
+企画時点の要件と現在の実装差分は [PRD.md](./PRD.md)、開発時の基本方針は [docs/development-guidelines.md](./docs/development-guidelines.md) にまとめています。
