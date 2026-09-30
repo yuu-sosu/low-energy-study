@@ -3,6 +3,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { COLORS, FONT_SIZE, SPACING } from '../constants';
 import { getBannerAdUnitID, isUsingTestAds } from '../ads/AdMobConfig';
+import { useAdsConsent } from '../ads/AdsConsentContext';
 
 type GoogleMobileAdsModule = {
   BannerAd: React.ComponentType<{
@@ -25,6 +26,7 @@ function canUseNativeAds(): boolean {
 }
 
 export function AdMobBanner({ compact = false }: { compact?: boolean }) {
+  const { canRequestAds } = useAdsConsent();
   const bannerRef = useRef<unknown>(null);
   const [hasLoadError, setHasLoadError] = useState(false);
 
@@ -37,7 +39,7 @@ export function AdMobBanner({ compact = false }: { compact?: boolean }) {
     }
   }, []);
 
-  if (!adsModule || hasLoadError) {
+  if (!canRequestAds || !adsModule || hasLoadError) {
     return <AdFallback compact={compact} />;
   }
 

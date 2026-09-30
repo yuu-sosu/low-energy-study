@@ -98,3 +98,5 @@ npx tsc --noEmit
 - READMEへの実機画面・操作例の追加
 
 企画時点の要件と現在の実装差分は [PRD.md](./PRD.md)、開発時の基本方針は [docs/development-guidelines.md](./docs/development-guidelines.md) にまとめています。
+
+App Store提出用の日本語テキストは [docs/app-store/metadata-ja.md](./docs/app-store/metadata-ja.md)、プライバシー回答の確認メモは [docs/app-store/privacy-disclosure-ja.md](./docs/app-store/privacy-disclosure-ja.md) にまとめています。

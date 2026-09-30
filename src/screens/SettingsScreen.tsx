@@ -1,11 +1,20 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAdsConsent } from '../ads/AdsConsentContext';
 import { COLORS, FONT_SIZE, SPACING } from '../constants';
 import { useSettings } from '../hooks/useSettings';
 
 export function SettingsScreen() {
   const { settings, loaded, update } = useSettings();
+  const { privacyOptionsRequired, showPrivacyOptions } = useAdsConsent();
+
+  async function openPrivacyOptions() {
+    const shown = await showPrivacyOptions();
+    if (!shown) {
+      Alert.alert('広告のプライバシー設定', '現在変更できる広告のプライバシー設定はありません。');
+    }
+  }
 
   if (!loaded) {
     return (
@@ -33,7 +42,41 @@ export function SettingsScreen() {
           onChange={(v) => update({ vibrationEnabled: v })}
         />
       </View>
+      <Text style={styles.sectionTitle}>プライバシー</Text>
+      <View style={styles.section}>
+        {privacyOptionsRequired ? (
+          <>
+            <ActionRow
+              label="広告のプライバシー設定"
+              description="広告に関する同意内容を確認・変更する"
+              onPress={openPrivacyOptions}
+            />
+            <View style={styles.divider} />
+          </>
+        ) : null}
+        <ActionRow
+          label="プライバシーポリシー"
+          description="データの取り扱いについて確認する"
+          onPress={() => Linking.openURL('https://glittery-baklava-452314.netlify.app')}
+        />
+      </View>
     </SafeAreaView>
+  );
+}
+
+function ActionRow({ label, description, onPress }: { label: string; description: string; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.row, pressed && styles.pressedRow]}
+    >
+      <View style={styles.rowText}>
+        <Text style={styles.rowLabel}>{label}</Text>
+        <Text style={styles.rowDescription}>{description}</Text>
+      </View>
+      <Text style={styles.disclosure}>›</Text>
+    </Pressable>
   );
 }
 
@@ -82,6 +125,13 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     overflow: 'hidden',
   },
+  sectionTitle: {
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.textSecondary,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.xl,
+    marginBottom: SPACING.sm,
+  },
   divider: {
     height: 1,
     backgroundColor: COLORS.border,
@@ -106,5 +156,12 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.sm,
     color: COLORS.textSecondary,
     marginTop: 2,
+  },
+  pressedRow: {
+    backgroundColor: COLORS.surface,
+  },
+  disclosure: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZE.xl,
   },
 });
