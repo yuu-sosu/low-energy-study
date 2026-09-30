@@ -26,6 +26,7 @@
 - AsyncStorage
 - Expo Notifications / Expo Haptics
 - React Native Google Mobile Ads / EAS Build
+- iOS 15.1以降
 
 ## 開発期間
 
@@ -63,6 +64,8 @@ npm start
 
 Expo Goでは主要な画面と操作を確認できます。ただし実際の広告表示など、スマートフォン固有の機能を確認するときは、実機確認用のdevelopment buildを使用します。
 
+development buildではGoogleのテスト広告IDへ自動で切り替わり、App Store向けのproduction buildだけ本番広告IDを使用します。
+
 ```sh
 npx eas build --platform ios --profile development-ios
 npx expo start --dev-client
@@ -75,6 +78,8 @@ npx expo start --dev-client
 ```sh
 npx tsc --noEmit
 ```
+
+広告を確認するときは、Home画面下部の広告枠に「Test Ad」相当の表示が出ることを確認します。表示されない場合は数十秒待ってアプリを再起動し、開発マシンと端末が同じネットワークに接続されていることを確認します。
 
 ## 現在の制約
 
