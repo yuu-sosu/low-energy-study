@@ -47,9 +47,6 @@ https://glittery-baklava-452314.netlify.app
 
 ## サポートURL
 
-https://github.com/yuu-sosu/low-energy-study/issues
-
-専用サポートページ公開後の候補：
 https://glittery-baklava-452314.netlify.app/support/
 
 ## 著作権
